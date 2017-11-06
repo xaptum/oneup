@@ -98,6 +98,7 @@ init() ->
                         filename:join(Dir, ?LIBNAME)
                 end
         end,
+    io:format("Loading ~p~n", [SoName]),
     erlang:load_nif(SoName, 0).
 
 %%% ============================================================================
