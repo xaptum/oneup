@@ -82,10 +82,8 @@ infinite_create_oneup() ->
 
 init() ->
     SoName =
-        case filelib:find_file("oneup.so", "_build/default/lib/oneup/priv") of
-            {ok, SoNameFull} -> [SoNamePrefix, _Rest] = string:split(SoNameFull, ".so"),
-                SoNamePrefix;
-            _Other ->
+        case priv_path_env() of
+            undefined ->
                 case code:priv_dir(?APPNAME) of
                     {error, bad_name} ->
                         case filelib:is_dir(filename:join(["..", priv])) of
@@ -96,10 +94,28 @@ init() ->
                         end;
                     Dir ->
                         filename:join(Dir, ?LIBNAME)
-                end
+                end;
+            SoNameFromEnv when is_list(SoNameFromEnv) -> SoNameFromEnv
         end,
     io:format("Loading ~p~n", [SoName]),
     erlang:load_nif(SoName, 0).
+
+%% to work with escript
+priv_path_env()->
+  case application:get_env(oneup, priv_path) of
+    undefined -> undefined;
+    {ok, PrivPath} when is_list(PrivPath) ->
+      case filelib:find_file("oneup.so", PrivPath) of
+        {ok, SoNameFull} ->
+          [SoNamePrefix, _Rest] = string:split(SoNameFull, ".so"),
+          SoNamePrefix;
+        _NotFound -> undefined
+      end;
+    {ok, InvalidPrivPath} ->
+      io:format("Expected priv_path env as string got ~p~n", [InvalidPrivPath]),
+      undefined
+  end.
+
 
 %%% ============================================================================
 %%% Benchmarks
