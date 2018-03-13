@@ -134,10 +134,11 @@ priv_path_env()->
 priv_path_from_env()->
   case application:get_env(oneup, priv_path) of
     undefined ->
+      io:format("GETTING ONEUP_PRIV_PATH: ~p~n", [os:getenv("ONEUP_PRIV_PATH")]),
       case os:getenv("ONEUP_PRIV_PATH") of
         false -> undefined;
         OneupPrivPath ->
-          io:format("Got priv path from env ~p~n", [OneupPrivPath]),
+          io:format("Got priv path from app priv_path env ~p~n", [OneupPrivPath]),
           {ok, OneupPrivPath}
       end;
     {ok, OneupPrivPath} -> {ok, OneupPrivPath}
