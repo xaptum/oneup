@@ -99,6 +99,7 @@ init() ->
     SoName =
         case priv_path_env() of
             undefined ->
+                io:format("Getting oneup lib from code:priv_dir..."),
                 case code:priv_dir(?APPNAME) of
                     {error, bad_name} ->
                         case filelib:is_dir(filename:join(["..", priv])) of
@@ -135,7 +136,9 @@ priv_path_from_env()->
     undefined ->
       case os:getenv("ONEUP_PRIV_PATH") of
         false -> undefined;
-        OneupPrivPath -> {ok, OneupPrivPath}
+        OneupPrivPath ->
+          io:format("Got priv path from env ~p~n", [OneupPrivPath]),
+          {ok, OneupPrivPath}
       end;
     {ok, OneupPrivPath} -> {ok, OneupPrivPath}
   end.
