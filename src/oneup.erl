@@ -116,7 +116,7 @@ init() ->
     erlang:load_nif(SoName, 0).
 
 priv_path_env()->
-  case application:get_env(oneup, priv_path) of
+  case priv_path_from_env() of
     undefined -> undefined;
     {ok, PrivPath} when is_list(PrivPath) ->
       case filelib:find_file("oneup.so", PrivPath) of
@@ -128,6 +128,16 @@ priv_path_env()->
     {ok, InvalidPrivPath} ->
       io:format("Expected priv_path env as string got ~p~n", [InvalidPrivPath]),
       undefined
+  end.
+
+priv_path_from_env()->
+  case application:get_env(oneup, priv_path) of
+    undefined ->
+      case os:getenv("ONEUP_PRIV_PATH") of
+        false -> undefined;
+        OneupPrivPath -> {ok, OneupPrivPath}
+      end;
+    {ok, OneupPrivPath} -> {ok, OneupPrivPath}
   end.
 
 
